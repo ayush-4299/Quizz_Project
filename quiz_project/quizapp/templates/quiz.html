@@ -1,0 +1,186 @@
+{% extends "base.html" %}
+{% block content %}
+
+<style>
+body {
+    background: #0f0f13;
+    color: white;
+    overflow-x: hidden;
+}
+
+.quiz-wrapper {
+    min-height: 85vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.question-text {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 500;
+    margin-bottom: 60px;
+}
+
+.options-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 25px;
+}
+
+.option-card {
+    padding: 45px;
+    border-radius: 16px;
+    font-size: 22px;
+    font-weight: 500;
+    text-align: center;
+    cursor: pointer;
+    transition: 0.2s ease;
+}
+
+.option-card:hover {
+    transform: scale(1.03);
+}
+
+.opt1 { background: linear-gradient(135deg, #b6b800, #8e9200); }
+.opt2 { background: linear-gradient(135deg, #a96cff, #6b2dd1); }
+.opt3 { background: linear-gradient(135deg, #ff8c2a, #e65100); }
+.opt4 { background: linear-gradient(135deg, #00c9a7, #009688); }
+
+.progress-bar {
+    height: 5px;
+    background: #4F46E5;
+    width: 0%;
+    transition: width 0.3s ease;
+}
+
+.finish-btn {
+    margin-top: 40px;
+    padding: 12px 30px;
+    background: #4F46E5;
+    border: none;
+    border-radius: 30px;
+    font-size: 18px;
+    display: none;
+}
+.quiz-timer {
+    position: fixed;
+    top: 90px;
+    right: 40px;
+    background: rgba(255,255,255,0.05);
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-weight: 600;
+    font-size: 18px;
+    color: #ffffff;
+    backdrop-filter: blur(8px);
+}
+
+.timer-warning {
+    color: #ef4444;
+    border-color: #ef4444;
+}
+</style>
+
+<div class="quiz-wrapper container">
+
+    <div class="progress-bar" id="progressBar"></div>
+
+    <form method="POST" id="quizForm">
+        {% csrf_token %}
+        <div class="quiz-timer" id="timer">
+    ⏳ 03:00
+</div>
+        {% for question in questions %}
+        <div class="question-slide" style="display:none;">
+            <div class="question-text">
+                {{ question.question_text }}
+            </div>
+
+            <div class="options-grid">
+                <div class="option-card opt1" onclick="selectOption('{{ question.id }}', 1)">
+                    {{ question.option1 }}
+                </div>
+
+                <div class="option-card opt2" onclick="selectOption('{{ question.id }}', 2)">
+                    {{ question.option2 }}
+                </div>
+
+                <div class="option-card opt3" onclick="selectOption('{{ question.id }}', 3)">
+                    {{ question.option3 }}
+                </div>
+
+                <div class="option-card opt4" onclick="selectOption('{{ question.id }}', 4)">
+                    {{ question.option4 }}
+                </div>
+            </div>
+
+            <input type="hidden" name="{{ question.id }}" id="answer_{{ question.id }}">
+        </div>
+        {% endfor %}
+
+        <div class="text-center">
+            <button type="submit" class="finish-btn" id="finishBtn">
+                End Test
+            </button>
+        </div>
+
+    </form>
+</div>
+
+<script>
+let currentQuestion = 0;
+const slides = document.querySelectorAll(".question-slide");
+const total = slides.length;
+const progressBar = document.getElementById("progressBar");
+const finishBtn = document.getElementById("finishBtn");
+
+function showQuestion(index) {
+    slides.forEach(slide => slide.style.display = "none");
+    slides[index].style.display = "block";
+
+    progressBar.style.width = ((index) / total) * 100 + "%";
+
+    if (index === total - 1) {
+        finishBtn.style.display = "inline-block";
+    }
+}
+
+function selectOption(questionId, option) {
+    document.getElementById("answer_" + questionId).value = option;
+
+    if (currentQuestion < total - 1) {
+        currentQuestion++;
+        showQuestion(currentQuestion);
+    }
+}
+
+showQuestion(currentQuestion);
+
+    let totalTime = 180; // 3 minutes in seconds
+    const timerElement = document.getElementById("timer");
+
+    const countdown = setInterval(() => {
+        let minutes = Math.floor(totalTime / 60);
+        let seconds = totalTime % 60;
+
+        seconds = seconds < 10 ? "0" + seconds : seconds;
+        timerElement.innerHTML = "⏳ " + minutes + ":" + seconds;
+
+        if (totalTime <= 30) {
+            timerElement.classList.add("timer-warning");
+        }
+
+        if (totalTime <= 0) {
+            clearInterval(countdown);
+            alert("Time is up! Submitting test...");
+            document.querySelector("form").submit();
+        }
+
+        totalTime--;
+    }, 1000);
+
+</script>
+
+{% endblock %}

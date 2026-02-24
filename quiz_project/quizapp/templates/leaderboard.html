@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container py-5">
+
+    <h2 class="mb-4">Leaderboard</h2>
+
+    <div class="leaderboard-card">
+
+        <div class="leaderboard-header">
+            <div>Rank</div>
+            <div>User</div>
+            <div>Subject</div>
+            <div>Score</div>
+        </div>
+
+        {% for u in top_users %}
+        <div class="leaderboard-row 
+            {% if forloop.counter == 1 %}rank-1
+            {% elif forloop.counter == 2 %}rank-2
+            {% elif forloop.counter == 3 %}rank-3
+            {% endif %}
+        ">
+            <div>#{{ forloop.counter }}</div>
+            <div>{{ u.user.username }}</div>
+            <div>{{ u.subject.name }}</div>
+            <div>{{ u.score }}</div>
+        </div>
+        {% empty %}
+        <div class="leaderboard-row text-center">
+            No attempts yet.
+        </div>
+        {% endfor %}
+
+    </div>
+
+</div>
+
+
+<style>
+
+.leaderboard-card {
+    background: rgba(255,255,255,0.05);
+    border-radius: 20px;
+    padding: 25px;
+    border: 1px solid rgba(255,255,255,0.08);
+}
+
+.leaderboard-header {
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr 1fr;
+    padding: 15px;
+    font-weight: 600;
+    color: #9ca3af;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+}
+
+.leaderboard-row {
+    display: grid;
+    grid-template-columns: 1fr 2fr 2fr 1fr;
+    padding: 16px;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.05);
+    transition: 0.3s ease;
+}
+
+.leaderboard-row:hover {
+    background: rgba(99,102,241,0.1);
+}
+
+.rank-1 {
+    background: rgba(255,215,0,0.08);
+}
+
+.rank-2 {
+    background: rgba(192,192,192,0.08);
+}
+
+.rank-3 {
+    background: rgba(205,127,50,0.08);
+}
+
+.leaderboard-row div:first-child {
+    font-weight: 600;
+}
+
+</style>
+
+{% endblock %}

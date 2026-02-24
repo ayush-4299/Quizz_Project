@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="d-flex justify-content-center align-items-center" style="min-height:85vh;">
+
+    <div class="card-modern" style="width:400px;">
+
+        <h3 class="text-center mb-4">Create Account</h3>
+
+        <form method="POST">
+            {% csrf_token %}
+
+            <input type="text" name="username"
+                   class="apple-input mb-3"
+                   placeholder="Username"
+                   required>
+
+            <input type="password" name="password"
+                   class="apple-input mb-4"
+                   placeholder="Password"
+                   required>
+
+            <button type="submit" class="btn btn-modern w-100">
+                Register
+            </button>
+        </form>
+
+        <div class="text-center mt-3">
+            <a href="{% url 'login' %}" style="color:#9ca3af;">
+                Already have an account? Login
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
